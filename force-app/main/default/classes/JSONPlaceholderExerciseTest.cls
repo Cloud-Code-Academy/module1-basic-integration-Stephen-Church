@@ -70,4 +70,55 @@ public class JSONPlaceholderExerciseTest {
         // Assert
         Assert.areEqual(200, statusCode, 'Delete request should return status code 200');
     }
+
+    @isTest
+    static void generateHttpRequest_noBody() {
+
+        String valueAfterBaseUrl = '/test';
+        String method = 'GET';
+
+        Test.startTest();
+        HttpRequest returnedRequest = JSONPlaceholderExercise.generateHttpRequest(valueAfterBaseUrl, method, null);
+        Test.stopTest();
+
+        String expectedUrl = JSONPlaceholderExercise.BASE_URL + valueAfterBaseURL;
+        Assert.areEqual(expectedUrl, returnedRequest.getEndpoint(), 'The endpoint was not set as expected.');
+        Assert.areEqual('GET', returnedRequest.getMethod(), 'The method was not set as expected.');
+        Assert.isTrue(String.isEmpty(returnedRequest.getBody()), 'The Body of the request should be null.');
+    }
+
+    @isTest
+    static void generateHttpRequest_withBody() {
+
+        String valueAfterBaseUrl = '/test';
+        String method = 'GET';
+        JSONPlaceholderExercise.Post testPost = new JSONPlaceholderExercise.Post('Title', 'Body', 1, 2);
+        testPost.serializePostAsJson();
+
+        Test.startTest();
+        HttpRequest returnedRequest = JSONPlaceholderExercise.generateHttpRequest(valueAfterBaseUrl, method, testPost);
+        Test.stopTest();
+
+        String expectedUrl = JSONPlaceholderExercise.BASE_URL + valueAfterBaseURL;
+        Assert.areEqual(expectedUrl, returnedRequest.getEndpoint(), 'The endpoint was not set as expected.');
+        Assert.areEqual('GET', returnedRequest.getMethod(), 'The method was not set as expected.');
+        Assert.isFalse(String.isEmpty(returnedRequest.getBody()), 'The Body of the request should be populated.');
+    }
+
+    @isTest
+    static void sendHttpRequest_exception() {
+
+        Boolean exceptionCaught = false;
+        Test.setMock(HttpCalloutMock.class, new JSONPlaceholderMock.JsonPlaceholderMockFailed());
+
+        Test.startTest();
+        try {
+            JSONPlaceholderExercise.sendHttpRequest(new HttpRequest());
+        } catch (CalloutException e) {
+            exceptionCaught = true;
+        }
+        Test.stopTest();
+
+        Assert.isTrue(exceptionCaught, 'A Callout Exception should have been caught.');
+    }
 } 

@@ -1,6 +1,52 @@
 public class JSONPlaceholderExercise {
-    private static final String BASE_URL = 'https://jsonplaceholder.typicode.com';
+    @TestVisible private static final String BASE_URL = 'https://jsonplaceholder.typicode.com';
+    private static final String SLASH_POSTS = '/posts';
+    private static final String SLASH = '/';
+    private static final String ERROR_STRING = 'Error making callout.';
+
+    public class Post {
+        public String title;
+        public String body;
+        public Integer id;
+        public Integer userId;
+        public String serializedJson {get; set;}
+
+        public Post (String title, String body, Integer userId, Integer id) {
+            this.title = title;
+            this.body = body;
+            this.id = id;
+            this.userId = userId;
+        }
+
+        public void serializePostAsJson() {
+            serializedJson = JSON.serialize(this);
+        }
+    }
     
+    public static HttpRequest generateHttpRequest(String valueAfterBaseUrl, String method, Post post) {
+
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint(BASE_URL + valueAfterBaseUrl);
+        request.setMethod(method);
+        if (post != null) {
+            post.serializePostAsJson();
+            request.setBody(post.serializedJson);
+        }
+        return request;
+    }
+
+    public static HttpResponse sendHttpRequest(HttpRequest request) {
+
+        Http http = new Http();
+        HttpResponse response = new HttpResponse();
+        try {
+            response = http.send(request);
+        } catch (CalloutException e) {
+            throw new CalloutException(ERROR_STRING);
+        }
+        return response;
+    }
+
     /**
      * Exercise 1: Implement a GET request to fetch a post by ID
      * Endpoint: /posts/{postId}
@@ -8,13 +54,9 @@ public class JSONPlaceholderExercise {
      * @return String - The JSON response from the API
      */
     public static String getPostById(Integer postId) {
-        // TODO: Student Implementation
-        // 1. Create a new HTTP request
-        // 2. Set the endpoint URL using BASE_URL + '/posts/' + postId
-        // 3. Set the HTTP method to 'GET'
-        // 4. Send the request and get the response
-        // 5. Return the response body as string
-        return null;
+        HttpRequest request = generateHttpRequest(SLASH_POSTS + SLASH + postId, 'GET', null);
+        HttpResponse response = sendHttpRequest(request);
+        return response.getBody();
     }
     
     /**
@@ -26,15 +68,10 @@ public class JSONPlaceholderExercise {
      * @return String - The JSON response from the API
      */
     public static String createPost(String title, String body, Integer userId) {
-        // TODO: Student Implementation
-        // 1. Create a new HTTP request
-        // 2. Set the endpoint URL using BASE_URL + '/posts'
-        // 3. Set the HTTP method to 'POST'
-        // 4. Create a JSON string with the post data
-        // 5. Set the request body
-        // 6. Send the request and get the response
-        // 7. Return the response body as string
-        return null;
+        Post postToCreate = new Post(title, body, userId, null);
+        HttpRequest request = generateHttpRequest(SLASH_POSTS, 'POST', postToCreate);
+        HttpResponse response = sendHttpRequest(request);
+        return response.getBody();
     }
     
     /**
@@ -47,15 +84,10 @@ public class JSONPlaceholderExercise {
      * @return String - The JSON response from the API
      */
     public static String updatePost(Integer postId, String title, String body, Integer userId) {
-        // TODO: Student Implementation
-        // 1. Create a new HTTP request
-        // 2. Set the endpoint URL using BASE_URL + '/posts/' + postId
-        // 3. Set the HTTP method to 'PUT'
-        // 4. Create a JSON string with the updated post data
-        // 5. Set the request body
-        // 6. Send the request and get the response
-        // 7. Return the response body as string
-        return null;
+        Post postToUpdate = new Post(title, body, userId, postId);
+        HttpRequest request = generateHttpRequest(SLASH_POSTS + SLASH + postId, 'PUT', postToUpdate);
+        HttpResponse response = sendHttpRequest(request);
+        return response.getBody();
     }
     
     /**
@@ -66,15 +98,10 @@ public class JSONPlaceholderExercise {
      * @return String - The JSON response from the API
      */
     public static String patchPostTitle(Integer postId, String title) {
-        // TODO: Student Implementation
-        // 1. Create a new HTTP request
-        // 2. Set the endpoint URL using BASE_URL + '/posts/' + postId
-        // 3. Set the HTTP method to 'PATCH'
-        // 4. Create a JSON string with only the title
-        // 5. Set the request body
-        // 6. Send the request and get the response
-        // 7. Return the response body as string
-        return null;
+        Post postToPatch = new Post(title, null, null, null);
+        HttpRequest request = generateHttpRequest(SLASH_POSTS + SLASH + postId, 'PATCH', postToPatch);
+        HttpResponse response = sendHttpRequest(request);
+        return response.getBody();
     }
     
     /**
@@ -84,12 +111,8 @@ public class JSONPlaceholderExercise {
      * @return Integer - The HTTP status code from the response
      */
     public static Integer deletePost(Integer postId) {
-        // TODO: Student Implementation
-        // 1. Create a new HTTP request
-        // 2. Set the endpoint URL using BASE_URL + '/posts/' + postId
-        // 3. Set the HTTP method to 'DELETE'
-        // 4. Send the request and get the response
-        // 5. Return the response status code
-        return null;
+        HttpRequest request = generateHttpRequest(SLASH_POSTS + SLASH + postId, 'DELETE', null);
+        HttpResponse response = sendHttpRequest(request);
+        return response.getStatusCode();
     }
 } 
