@@ -55,4 +55,11 @@ public class JSONPlaceholderMock implements HttpCalloutMock {
             + '"body": "Original body remains unchanged"'
             + '}';
     }
+
+    public class JsonPlaceholderMockFailed implements HttpCalloutMock {
+
+        public HttpResponse respond (HttpRequest request) {
+            throw new CalloutException('A callout exception occurred.');
+        }
+    }
 } 
